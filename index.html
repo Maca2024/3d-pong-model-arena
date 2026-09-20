@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#061018" />
+    <meta name="description" content="A small 3D Pong match against an adaptive model ensemble." />
+    <title>MODEL ARENA // 3D PONG</title>
+  </head>
+  <body>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+    <div class="shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Model Arena home">
+          <span class="brand-mark"><span></span><span></span><span></span></span>
+          <span>MODEL ARENA</span>
+        </a>
+        <div class="topbar-meta">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span>LOCAL MATCH // 08 MODELS ONLINE</span>
+          <span class="topbar-code">AETHERDEV_3D</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow">A RALPH-98 EXPERIMENT</p>
+            <h1 id="page-title">PONG, <em>with a mind.</em></h1>
+            <p class="lede">A compact neon court where your reflexes meet an adaptive model opponent. The ensemble watches the rally; Ralph-98 learns the angle.</p>
+          </div>
+          <div class="match-badge" aria-label="Match target: first to seven points">
+            <span class="badge-label">MATCH TARGET</span>
+            <strong>FIRST TO 07</strong>
+            <span class="badge-line"></span>
+          </div>
+        </section>
+
+        <section class="arena-layout" aria-label="3D Pong game">
+          <aside class="side-panel left-panel">
+            <div class="panel-kicker">01 / MODEL STATUS</div>
+            <div class="model-identity">
+              <div class="model-orb" aria-hidden="true"><span></span></div>
+              <div>
+                <h2>RALPH-98</h2>
+                <p>Adaptive court intelligence</p>
+              </div>
+            </div>
+            <div class="metric-list">
+              <div class="metric-row"><span>CONFIDENCE</span><strong id="confidence">98.0%</strong></div>
+              <div class="meter"><span id="confidence-meter"></span></div>
+              <div class="metric-row"><span>REACTION</span><strong id="reaction">0.24s</strong></div>
+              <div class="metric-row"><span>STRATEGY</span><strong id="strategy">ANGLE READ</strong></div>
+            </div>
+            <div class="model-callout" id="model-callout">Waiting for the first serve.</div>
+            <div class="squad-block">
+              <div class="panel-kicker">ENSEMBLE / 08</div>
+              <div class="squad-grid" id="squad-grid" aria-label="Eight model ensemble"></div>
+            </div>
+          </aside>
+
+          <div class="court-wrap">
+            <div class="court-frame">
+              <div id="game-stage" class="game-stage" data-testid="game-stage" aria-label="3D Pong court. Use W/S or arrow keys, or move your pointer over the court."></div>
+              <div class="court-scanline" aria-hidden="true"></div>
+              <div class="court-corner corner-tl" aria-hidden="true"></div>
+              <div class="court-corner corner-tr" aria-hidden="true"></div>
+              <div class="court-corner corner-bl" aria-hidden="true"></div>
+              <div class="court-corner corner-br" aria-hidden="true"></div>
+              <div class="scoreboard" aria-live="polite">
+                <div><span class="score-name player-name">YOU</span><strong id="player-score" data-testid="player-score">00</strong></div>
+                <span class="score-divider">:</span>
+                <div><strong id="ai-score" data-testid="ai-score">00</strong><span class="score-name">RALPH</span></div>
+              </div>
+              <div class="court-status" id="court-status" data-testid="court-status">READY / PRESS START</div>
+            </div>
+            <div class="court-caption">
+              <span><i class="key-icon">W</i><i class="key-icon">S</i> MOVE PADDLE</span>
+              <span><i class="mouse-icon"></i> POINTER CONTROL</span>
+              <span>SPACE START / PAUSE</span>
+            </div>
+          </div>
+
+          <aside class="side-panel right-panel">
+            <div class="panel-kicker">02 / PLAYER CONTROL</div>
+            <div class="player-card">
+              <div class="player-avatar">YOU</div>
+              <div><h2>HUMAN INPUT</h2><p>Fast hands / wild angles</p></div>
+            </div>
+            <div class="control-copy">Move inside the court. The longer the rally, the more accurately Ralph reads your return.</div>
+            <button class="primary-button" id="start-button" data-testid="start-button" type="button"><span class="button-glyph">▶</span><span>START MATCH</span></button>
+            <button class="secondary-button" id="reset-button" data-testid="reset-button" type="button">RESET COURT <span>↺</span></button>
+            <div class="round-info"><span>RALLY</span><strong id="rally-count">00</strong></div>
+            <div class="round-info"><span>LAST CALL</span><strong id="last-call">STANDBY</strong></div>
+            <div class="rules-note"><span class="rules-dot"></span><p>First to seven. One ball. No excuses.</p></div>
+          </aside>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>BUILT WITH THREE.JS / AETHERDEV</span>
+        <span class="footer-center">MODEL-ENSEMBLE PROTOCOL // ACTIVE</span>
+        <span>R-98 / 2026</span>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
