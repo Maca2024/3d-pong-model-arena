@@ -101,3 +101,25 @@ h1 em { color: var(--coral); font-style: normal; }
 @media (max-width: 1120px) { .arena-layout { grid-template-columns: 1fr 2fr; }.right-panel { grid-column: 1 / -1; min-height: auto; display: grid; grid-template-columns: 1fr 1.3fr; gap: 0 1.2rem; }.right-panel .panel-kicker { grid-column: 1 / -1; }.right-panel .player-card { margin-top: 0.4rem; }.right-panel .control-copy { align-self: center; }.right-panel .primary-button, .right-panel .secondary-button { grid-column: 2; }.right-panel .round-info { grid-column: 1; }.right-panel .rules-note { grid-column: 1 / -1; } }
 @media (max-width: 760px) { .shell { width: min(100% - 28px, 620px); }.topbar-meta { display: none; }.intro { display: block; padding: 48px 0 27px; }.intro .match-badge { margin-top: 2.2rem; text-align: left; }.intro .badge-line { margin-left: 0; }.arena-layout { display: flex; flex-direction: column; }.court-wrap { order: -1; }.court-frame { min-height: 420px; }.side-panel { min-height: auto; }.left-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }.left-panel .panel-kicker, .left-panel .squad-block { grid-column: 1 / -1; }.left-panel .model-identity { margin: 0.6rem 0 1rem; }.left-panel .metric-list { margin-top: 0.6rem; }.right-panel { display: block; }.right-panel .primary-button, .right-panel .secondary-button { width: 48%; display: inline-flex; }.right-panel .primary-button { margin-top: 0; }.right-panel .secondary-button { margin-left: 3%; }.footer { flex-wrap: wrap; line-height: 1.6; }.footer-center { order: 3; width: 100%; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
+
+/* Beeldvullende spelmodus, hoorbare feedback en royale touch-targets. */
+body { min-height: 100svh; }
+main { min-height: calc(100svh - 150px); display: flex; flex-direction: column; justify-content: center; }
+.arena-layout { width: 100%; }
+.court-frame { min-height: clamp(530px, 68svh, 820px); }
+.utility-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 0.45rem; }
+.utility-actions .secondary-button { width: 100%; min-height: 44px; padding: 0.72rem 0.65rem; border: 1px solid var(--line); background: rgba(6, 16, 24, 0.35); font-size: 0.54rem; }
+.utility-actions .secondary-button:first-child { grid-column: 1 / -1; }
+.utility-actions .secondary-button:hover, .utility-actions .secondary-button:focus-visible { border-color: var(--mint); background: rgba(127, 241, 209, 0.08); box-shadow: 0 0 18px rgba(127, 241, 209, 0.08); }
+#sound-button[aria-pressed="false"] { color: var(--dim); border-color: rgba(127, 241, 209, 0.09); }
+.court-frame:fullscreen { width: 100vw; height: 100dvh; min-height: 100dvh; border: 0; border-radius: 0; }
+.court-frame:fullscreen .game-stage { cursor: none; }
+.court-frame:fullscreen .scoreboard { top: 2.2rem; }
+.court-frame:fullscreen .court-status { bottom: 2.2rem; }
+
+@media (max-width: 760px) {
+  main { min-height: auto; }
+  .court-frame { min-height: min(68svh, 560px); }
+  .utility-actions { grid-template-columns: 1fr 1fr; }
+  .utility-actions .secondary-button { width: 100%; display: flex; }
+}

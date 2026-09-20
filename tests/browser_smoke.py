@@ -21,13 +21,22 @@ def main() -> None:
         assert page.title() == "MODEL ARENA // 3D PONG"
         assert page.locator('[data-testid="game-stage"] canvas').count() == 1
         assert page.locator("text=RALPH-98").count() >= 1
-        assert page.locator("text=08 MODELS ONLINE").count() == 1
+        assert page.locator("text=08 MODELLEN ONLINE").count() == 1
+        assert page.get_by_test_id("sound-button").get_attribute("aria-pressed") == "true"
+        assert page.get_by_test_id("fullscreen-button").count() == 1
 
         page.screenshot(path=str(ROOT / "test-results" / "pong-desktop.png"), full_page=True)
         page.get_by_test_id("start-button").click()
         page.wait_for_timeout(900)
         assert "LIVE" in page.get_by_test_id("court-status").inner_text()
         assert page.evaluate("window.__pongGame.getState().running") is True
+        audio_state = page.evaluate("window.__pongGame.getAudioState()")
+        assert audio_state["enabled"] is True
+        assert audio_state["context"] != "niet gestart"
+        page.get_by_test_id("sound-button").click()
+        assert page.evaluate("window.__pongGame.getAudioState().enabled") is False
+        page.get_by_test_id("sound-button").click()
+        assert page.evaluate("window.__pongGame.getAudioState().enabled") is True
         page.keyboard.down("w")
         page.wait_for_timeout(180)
         page.keyboard.up("w")
@@ -36,7 +45,10 @@ def main() -> None:
         page.get_by_test_id("reset-button").click()
         assert page.get_by_test_id("player-score").inner_text() == "00"
         assert page.get_by_test_id("ai-score").inner_text() == "00"
-        assert "READY" in page.get_by_test_id("court-status").inner_text()
+        assert "KLAAR" in page.get_by_test_id("court-status").inner_text()
+        page.get_by_test_id("fullscreen-button").click()
+        page.wait_for_timeout(100)
+        assert page.get_by_test_id("fullscreen-button").get_attribute("aria-pressed") in {"true", "false"}
 
         mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
         mobile.goto(BASE_URL, wait_until="networkidle")

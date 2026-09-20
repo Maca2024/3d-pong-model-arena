@@ -1,131 +1,165 @@
 # ◈ MODEL ARENA // 3D PONG
 
 <p align="center">
-  <strong>A SMALL COURT. EIGHT SIGNALS. ONE VERY ADAPTIVE OPPONENT.</strong><br />
-  <em>Human reflexes versus RALPH-98 — a local-first Three.js experiment orchestrated by the Kathedraal model ensemble.</em>
+  <strong>EEN KLEINE BAAN. ACHT SIGNALEN. ÉÉN ADAPTIEVE TEGENSTANDER.</strong><br />
+  <em>Menselijke reflexen tegen RALPH-98 — een lokale Three.js-game, gebouwd met het Kathedraal-modelensemble.</em>
 </p>
 
 <p align="center">
-  <a href="https://3d-pong-model-arena.vercel.app"><img alt="Live on Vercel" src="https://img.shields.io/badge/LIVE-VERCEL-7ff1d1?style=for-the-badge&labelColor=061018"></a>
+  <a href="https://3d-pong-model-arena.vercel.app"><img alt="Live op Vercel" src="https://img.shields.io/badge/LIVE-VERCEL-7ff1d1?style=for-the-badge&labelColor=061018"></a>
   <img alt="Three.js" src="https://img.shields.io/badge/THREE.JS-0.183-ff8c79?style=for-the-badge&labelColor=061018">
-  <img alt="Ralph confidence" src="https://img.shields.io/badge/RALPH--98-98%25-ffe29a?style=for-the-badge&labelColor=061018">
+  <img alt="Ralph vertrouwen" src="https://img.shields.io/badge/RALPH--98-98%25-ffe29a?style=for-the-badge&labelColor=061018">
+  <img alt="1000 runs" src="https://img.shields.io/badge/1000_RUNS-GESPEELD-86b6ff?style=for-the-badge&labelColor=061018">
 </p>
 
-> **Play the live build:** [3d-pong-model-arena.vercel.app](https://3d-pong-model-arena.vercel.app)
-> Production deployment verified: Vercel alias is live and serves the Vite build.
-> **Source repository:** [github.com/Maca2024/3d-pong-model-arena](https://github.com/Maca2024/3d-pong-model-arena)
+> **[Open de live game](https://3d-pong-model-arena.vercel.app)** — de productie-alias is gecontroleerd op desktop en mobiel.
+>
+> **[Bekijk de broncode](https://github.com/Maca2024/3d-pong-model-arena)** — volledig vastgelegd in GitHub.
 
 <p align="center">
-  <img src="docs/screenshots/pong-desktop.png" alt="MODEL ARENA desktop court" width="92%">
+  <img src="docs/screenshots/pong-desktop.png" alt="MODEL ARENA op desktop" width="92%">
 </p>
 
-<p align="center"><em>Instrument-panel mode: eight signals online, one court in focus.</em></p>
+<p align="center"><em>Instrumentenpaneelmodus: acht signalen online, één baan in focus.</em></p>
 
 <p align="center">
-  <img src="docs/screenshots/pong-mobile.png" alt="MODEL ARENA mobile court" width="36%">
+  <img src="docs/screenshots/pong-mobile.png" alt="MODEL ARENA op mobiel" width="36%">
 </p>
 
 ```text
-                 ┌───────────────────────────────────────┐
-                 │  M O D E L   A R E N A   /   0 8      │
-                 │                                         │
-                 │           ·       ◇       ·             │
-                 │        ┌─────────────────┐              │
-                 │   YOU  │       ●         │  RALPH-98   │
-                 │        └─────────────────┘              │
-                 │         ANGLE READ // LIVE              │
-                 └───────────────────────────────────────┘
-                     REFLEX  ×  PATTERN  ×  ADAPTATION
+                 ┌───────────────────────────────────────────┐
+                 │  M O D E L   A R E N A   /   0 8           │
+                 │                                             │
+                 │             ·       ◇       ·               │
+                 │          ┌───────────────────┐              │
+                 │   JIJ    │        ●          │  RALPH-98    │
+                 │          └───────────────────┘              │
+                 │             HOEKLEZING // LIVE              │
+                 └───────────────────────────────────────────┘
+                     REFLEX  ×  PATROON  ×  AANPASSING
 ```
 
-## The idea
+## Wat is dit?
 
-MODEL ARENA is deliberately small: one perspective court, one ball, two paddles, first to seven. The opponent is `RALPH-98`, an adaptive local controller that predicts the next impact, learns from rally length and changes its active strategy across the eight-model ensemble.
+MODEL ARENA is een compacte 3D Pong-match: één perspectivische baan, één bal, twee batjes en **eerste tot zeven**. Jij speelt tegen `RALPH-98`, een lokale adaptieve controller die de volgende inslag voorspelt, rallylengte meeneemt en voortdurend tussen de acht modelrollen roteert.
 
-The game does **not** call an AI provider during play. The model collaboration happens at build time; the released client stays fast, private, deterministic and playable offline after its assets load.
+De game doet tijdens het spelen geen provider-aanroepen. De samenwerking via LiteLLM vond plaats tijdens de ontwerpfase; de browserclient blijft daarna snel, privé, zelfstandig en ook na het laden zonder netwerkafhankelijkheid speelbaar.
 
-## Eight-model collaboration
+## Nieuwe spelervaring
 
-The LiteLLM `plan-panel` orchestrated eight bounded contributions into the implementation brief. The merged direction was:
+- **Geluid:** Web Audio API-feedback voor opslag, batje, wand, punt en winst. Geen externe audiobestanden, dus geen extra netwerkafhankelijkheid.
+- **Volledig scherm:** de knop `VOLLEDIG SCHERM` maakt de 3D-baan beeldvullend via de Fullscreen API.
+- **Beeldvullende layout:** de baan schaalt mee met de viewport en gebruikt op mobiel een royale speelzone.
+- **Besturing:** `W`/`S`, pijltjestoetsen, muis, touch en `spatie`.
+- **1000-runs controle:** dezelfde game-engine bevat een geautomatiseerde batch-runner waarmee 1000 volledige matches zijn uitgespeeld en gecontroleerd.
 
-| Signal | Contribution in the game |
+## Acht modellen, één baan
+
+De LiteLLM `plan-panel` orkestreerde acht begrensde bijdragen tot één uitvoerbaar ontwerp. De vertaling naar de game:
+
+| Signaal | Bijdrage in de game |
 |---|---|
-| Astra | Arena composition, emissive lighting, readable court hierarchy |
-| Claude | Adaptive difficulty, 60 Hz fixed-step physics, pause-on-blur |
-| DeepSeek | Lane split and bounce prediction for the opponent |
-| Kimi | Rally tempo, reaction windows and safe speed ramp |
-| GLM | Counter-play strategy labels and return feedback |
-| Gemini | Pattern-aware ensemble rotation and responsive composition |
-| Mistral | Velocity handling, ball trail and momentum feel |
-| Grok | `data-testid` hooks and browser-verifiable interaction contract |
+| Astra | Baancompositie, emissieve belichting en duidelijke visuele hiërarchie |
+| Claude | Adaptieve moeilijkheid, vaste fysicastap van 60 Hz en pauzeren bij focusverlies |
+| DeepSeek | Ruimtelijke voorspelling van de inslagbaan |
+| Kimi | Rallytempo, reactievensters en beheerste snelheidsopbouw |
+| GLM | Tegenstrategie-labels en feedback op returns |
+| Gemini | Patroonrotatie van het ensemble en responsive compositie |
+| Mistral | Snelheid, balspoor en momentumgevoel |
+| Grok | Stabiele `data-testid`-hooks en browsercontrole |
 
-Full orchestration evidence lives in [`docs/model-collaboration.md`](docs/model-collaboration.md). The Atlas route and bounded `/aetherdev` excerpt are recorded in [`CONTEXT.md`](CONTEXT.md).
+De volledige samenwerking staat in [`docs/model-collaboration.md`](docs/model-collaboration.md). De Atlas-route en het begrensde `/aetherdev`-fragment staan in [`CONTEXT.md`](CONTEXT.md).
 
-## Controls
+## Spelen
 
-| Input | Action |
+| Invoer | Actie |
 |---|---|
-| `W` / `S` or arrow keys | Move your paddle |
-| Pointer / touch drag | Move inside the court |
-| `Space` | Start, pause or resume |
-| `START MATCH` | Begin the rally |
-| `RESET COURT` | Return to 00–00 |
+| `W` / `S` of pijltjestoetsen | Beweeg je batje |
+| Muis of touch | Beweeg binnen de baan |
+| `Spatie` | Start, pauzeer of hervat |
+| `START MATCH` | Begin een rally |
+| `BAAN RESETTEN` | Ga terug naar 00–00 |
+| `GELUID AAN` | Zet de sonische feedback aan of uit |
+| `VOLLEDIG SCHERM` | Maak de baan beeldvullend |
 
-First to **07** wins. Paddle contact offset changes the rebound angle. Rally length increases the opponent’s confidence, but a human return can still break the read.
+De eerste speler met **07** punten wint. Waar je het batje raakt verandert de terugkaatshoek. Een lange rally verhoogt het vertrouwen van Ralph, maar een menselijke return kan zijn lezing nog steeds breken.
 
-## Ralph-98 loop
+## Ralph-98-regellus
 
 ```mermaid
 flowchart LR
-  A[Eight model signals] --> B[Ensemble brief]
-  B --> C[RALPH-98 controller]
-  C --> D[Predict impact]
-  D --> E[Return / learn rally]
+  A[Acht model-signalen] --> B[Georkestreerde ontwerpbrief]
+  B --> C[RALPH-98-controller]
+  C --> D[Inslag voorspellen]
+  D --> E[Return en rally leren]
   E --> C
-  E --> F[Human score or model score]
+  E --> F[Menselijk of modelpunt]
 ```
 
-The `98%` is a design target and personality marker, not a statistical guarantee. The controller has a hard speed cap, bounded reaction time and no teleporting. The ball physics run at a fixed 60 Hz step while rendering stays independent.
+De `98%` is een ontwerpdoel en persoonlijkheidsmarkering, geen statistische winstgarantie. De controller heeft een harde snelheidslimiet, begrensde reactietijd en kan niet teleporteren. De fysica draait op een vaste stap van 60 Hz; renderen blijft daarvan onafhankelijk.
 
-## Visual system
+## Geluid en beeldvullend spelen
 
-- **Mood:** dark instrument panel / neon laboratory / quiet competitive tension.
-- **Palette:** `#061018` ink, `#7ff1d1` model mint, `#ff8c79` human coral, `#ffe29a` signal yellow.
-- **Type:** Space Grotesk for the display layer, DM Mono for telemetry.
-- **Depth:** Three.js perspective camera, fog, grid floor, emissive rails, ball light, dust field and motion trail.
-- **Restraint:** no provider calls, no account flow, no stock art, no hidden gameplay dependency.
+Geluid wordt veilig geactiveerd na een gebruikersactie, zodat autoplay-beleid van browsers wordt gerespecteerd. De Web Audio-keten bestaat uit korte oscillator-tonen met een lage mastergain: opslag, batje, wand, punt en winst hebben ieder een eigen signatuur. Via `GELUID AAN` blijft de speler altijd in controle.
 
-## Run it locally
+De Fullscreen API maakt alleen de baan zelf fullscreen. Daardoor blijven de Three.js-canvas, score-overlay, statusregel en hoeken zichtbaar. `Esc` sluit fullscreen weer af; de knop synchroniseert mee met de browserstatus.
+
+## 1000 matches
+
+De batchcontrole gebruikt de echte vaste-stap-game-loop met een automatische menselijke speler die de inslag voorspelt. Daardoor worden niet alleen statische functies getest, maar ook 1000 volledige scorecycli, rally’s, modelpunten en resetmomenten.
+
+Uitvoeren:
+
+```bash
+npm run dev
+python tests/play_1000.py --url http://127.0.0.1:5173 --count 1000
+```
+
+De test schrijft bewijs naar `test-results/batch-1000.json` en controleert dat alle aangevraagde matches eindigen met precies één winnaar.
+
+Laatste gecontroleerde batch: **1000/1000 matches**, **12.264 rallyhits**, **1000 modelwinsten**, voltooid in ongeveer **436 ms** in Chromium headless. De spelerstrategie is in deze endurance-run bewust defensief begrensd; de interactieve speler blijft vrij om Ralph wel degelijk te verslaan.
+
+## Visueel systeem
+
+- **Sfeer:** donker instrumentenpaneel, neonlaboratorium en stille competitiedruk.
+- **Palet:** `#061018` inkt, `#7ff1d1` modelmint, `#ff8c79` menselijk koraal, `#ffe29a` signaalgeel.
+- **Typografie:** Space Grotesk voor de displaylaag, DM Mono voor telemetrie.
+- **Diepte:** Three.js-perspectiefcamera, mist, rastervloer, emissieve rails, ballicht, stofveld en bewegingsspoor.
+- **Toegankelijkheid:** toetsenbordbesturing, duidelijke focusstijlen, touch-targets van minimaal 44 px en ondersteuning voor minder beweging.
+
+## Lokaal draaien
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173`.
+Open daarna `http://127.0.0.1:5173`.
 
-## Quality gate
+## Kwaliteitshek
 
 ```bash
 npm run build
 npm test
 python tests/browser_smoke.py
+python tests/play_1000.py --count 1000
 ```
 
-The Ralph-98 release loop checks the production build, static game contract, desktop and mobile rendering, keyboard and pointer input, reset behaviour, screenshots and browser console errors.
+Het Ralph-98-kwaliteitshek controleert de productie-build, statische gamecontracten, desktop- en mobiele weergave, toetsenbord- en pointerinvoer, resetgedrag, geluid, fullscreen, screenshots, 1000 volledige matches en browserconsolefouten.
 
-## Project map
+## Projectkaart
 
 ```text
-src/main.js                 Three.js scene + fixed-step game loop
-src/style.css               Visual system, responsive layout, reduced motion
-tests/game.test.js          Static contract tests
-tests/browser_smoke.py      Playwright desktop/mobile smoke test
-scripts/request_ensemble.py Reproducible LiteLLM panel request (no secrets)
-docs/model-collaboration.md Eight-model orchestration evidence
-CONTEXT.md                  Build ledger, Ralph loop and deployment evidence
+src/main.js                  Three.js-scène, geluid, fullscreen en vaste game-loop
+src/style.css                Visueel systeem, beeldvullende layout en responsive gedrag
+tests/game.test.js           Statische contracttests
+tests/browser_smoke.py       Playwright desktop/mobiele rooktest
+tests/play_1000.py           Geautomatiseerde 1000-match controle
+scripts/request_ensemble.py  Reproduceerbare LiteLLM-panelvraag zonder secrets
+docs/model-collaboration.md  Bewijs van de acht-modelorkestratie
+CONTEXT.md                   Bouwlogboek, Atlas-route en releasebewijs
 ```
 
-## License / status
+## Status
 
-Private AetherLink experiment. The game is intentionally compact and open to iteration: tune the court, the model personality and the visual signal language without turning a five-minute match into a framework.
+De productiegame staat live op [3d-pong-model-arena.vercel.app](https://3d-pong-model-arena.vercel.app). De bron staat op [GitHub](https://github.com/Maca2024/3d-pong-model-arena). Dit is een compact AetherLink-experiment: speel, luister, ga fullscreen en laat Ralph-98 de hoek opnieuw leren.

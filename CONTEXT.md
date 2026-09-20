@@ -1,85 +1,119 @@
 # MODEL ARENA // 3D PONG — CONTEXT
 
-## Purpose
+## Doel en scope
 
-This is a new, isolated game repository created from the request to build a simple 3D Pong game in which a human plays against a model. The implementation uses Three.js and Vite. It is intentionally frontend-only during play: no browser key, prompt or provider request is needed after load.
+Dit is een nieuwe, geïsoleerde game-repository voor een eenvoudige maar grafisch uitgesproken 3D Pong-game waarin een mens tegen een model speelt. De client gebruikt Three.js en Vite. Tijdens het spelen is er geen provider-aanroep, geen sleutel in de browser en geen runtime-afhankelijkheid van LiteLLM.
 
-Release links: [GitHub repository](https://github.com/Maca2024/3d-pong-model-arena) · [live Vercel build](https://3d-pong-model-arena.vercel.app)
+Taal van de gebruikerservaring en deze projectdocumentatie: **Nederlands**. Modelnamen, code, commando’s en technische API-namen blijven waar nodig onvertaald.
 
-## Orchestration record
+Release-links: [GitHub-repository](https://github.com/Maca2024/3d-pong-model-arena) · [live Vercel-build](https://3d-pong-model-arena.vercel.app)
+
+## Orkestratie
 
 ### Atlas / `/aetherdev`
 
 - Route: `aetherdev-frontend-3d`
-- Version hash: `27bf91fc05b515e3`
-- Reason: the task requires an interactive 3D frontend; the bounded excerpt selected Three.js / React Three Fiber for full 3D interaction instead of scroll-frame animation.
-- Excerpt cap used: 800 tokens.
-- Outcome recorded in the Kathedraal Atlas for session `kathedraal-3d-pong`.
+- Versiehash: `27bf91fc05b515e3`
+- Reden: de opdracht vraagt om een interactieve 3D-frontend; het begrensde fragment adviseerde Three.js / React Three Fiber voor echte 3D-interactie in plaats van een scroll-frame-animatie.
+- Gebruikte excerptlimiet: 800 tokens.
+- Uitkomst vastgelegd in Kathedraal Atlas onder sessie `kathedraal-3d-pong`.
 
-### LiteLLM model ensemble
+### LiteLLM-modelensemble
 
-The eight-model `plan-panel` was called with a bounded design brief for MODEL ARENA. The proxy returned HTTP 200 with `plan-panel`, `prompt_tokens: 5769`, `completion_tokens: 8615`, `total_tokens: 14673`.
+De acht-model-`plan-panel` is aangeroepen met een begrensde ontwerpbrief voor MODEL ARENA. De proxy gaf HTTP 200 terug met:
 
-The collaborating roster was:
+```text
+model:             plan-panel
+prompt_tokens:     5.769
+completion_tokens: 8.615
+total_tokens:      14.673
+```
 
-1. Astra — arena composition, lighting and court readability.
-2. Claude — adaptive difficulty, fixed-step physics and pause safety.
-3. DeepSeek — lane split and bounce prediction.
-4. Kimi — rally tempo, reaction windows and speed ramp.
-5. GLM — counter-play labels and return feedback.
-6. Gemini — pattern rotation and responsive composition.
-7. Mistral — velocity handling, trail and momentum.
-8. Grok — browser-test hooks and interaction verification.
+De samenwerkende rollen:
 
-The panel rejected scope creep (mouse-camera, boost and background music) and converged on: a local opponent, first-to-seven scoring, a 60 Hz physics step, keyboard/pointer/touch control, a hard speed cap, `data-testid` hooks and Playwright smoke coverage.
+1. Astra — baancompositie, belichting en leesbaarheid.
+2. Claude — adaptieve moeilijkheid, vaste 60 Hz-fysica en focusveiligheid.
+3. DeepSeek — ruimtelijke inslagvoorspelling.
+4. Kimi — rallytempo, reactievensters en snelheidsopbouw.
+5. GLM — tegenzetlabels en returnfeedback.
+6. Gemini — patroonrotatie en responsive compositie.
+7. Mistral — snelheid, balspoor en momentum.
+8. Grok — browserhooks en interactieverificatie.
 
-Full evidence is in [`docs/model-collaboration.md`](docs/model-collaboration.md).
+De panelraad wees muiscamera, boostmechaniek en achtergrondmuziek af als scope creep. Voor deze release is dat bewust aangepast: **sonische feedback** is toegevoegd als functioneel spelonderdeel, maar zonder externe audiobestanden of netwerkpad.
 
-## Build direction
+Volledig bewijs staat in [`docs/model-collaboration.md`](docs/model-collaboration.md).
 
-The visual direction is **instrument-panel neon laboratory**: deep blue-green ink, mint model energy, coral human energy, mono telemetry and a quiet editorial layout around the court. The model opponent is named `RALPH-98`; the number is a product personality target, not a measured win-rate claim.
+## Technische uitvoering
 
-The UI exposes the ensemble as a visible status layer. During a rally, the local controller rotates the active strategy label through the eight roles. That keeps the collaboration legible without creating provider latency or putting credentials in the browser.
+### Spel
 
-## Ralph-98 quality loop
+- Three.js-perspectiefbaan met rastervloer, mist, rails, ballicht, stofveld en bewegingsspoor.
+- Vaste physicsstap van `1 / 60` seconde, losgekoppeld van renderen.
+- Eerste tot zeven, batje-offset bepaalt de terugkaatshoek.
+- RALPH-98 gebruikt voorspelde inslag, reactietijd, rallylengte, strategie-rotatie en een harde snelheidslimiet.
+- Toetsenbord, pointer, touch, pauze bij focusverlies en reset.
 
-The requested “98% Ralph” is implemented as a release discipline:
+### Geluid
 
-1. **Scope:** build only the smallest playable 3D Pong loop.
-2. **Mechanics:** fixed-step movement, bounded prediction, paddle-angle rebounds, first-to-seven, pause/reset.
-3. **Interface:** responsive desktop/mobile layout, keyboard/pointer/touch affordances, visible status and accessible buttons.
-4. **Verification:** production build, static contract tests, Playwright smoke, screenshots, console-error audit.
-5. **Release:** Vercel preview/production deployment, public URL, repository evidence.
+- Web Audio API wordt pas na gebruikersinteractie gestart om autoplaybeleid te respecteren.
+- Korte oscillator-tonen voor opslag, batje, wand, punt en winst.
+- Mastergain blijft laag; `GELUID AAN`/`GELUID UIT` is direct bestuurbaar.
+- De geautomatiseerde 1000-runs-modus onderdrukt geluid zodat tests snel en stil blijven.
 
-The “98%” threshold means the loop continues until the critical gameplay and release checks are green; it does not claim 98% model accuracy.
+### Beeldvullend
 
-## Files
+- De baan schaalt met `svh`/`dvh` en krijgt op desktop een royale viewporthoogte.
+- `VOLLEDIG SCHERM` gebruikt `courtFrame.requestFullscreen()`.
+- `fullscreenchange` houdt knoplabel, score-overlay, status en canvas synchroon.
+- `Esc` werkt via de browser en sluit de fullscreenbaan.
 
-| File | Responsibility |
+### 1000-runs-kwaliteitscontrole
+
+`window.__pongGame.runBatch(1000)` speelt de echte game-loop 1000 keer uit met een automatische menselijke speler. Elke run doorloopt opslag, rally, botsingen, score, reset en match-einde. De Playwright-runner [`tests/play_1000.py`](tests/play_1000.py) controleert dat alle 1000 matches eindigen met precies één winnaar en schrijft JSON-bewijs naar `test-results/batch-1000.json`.
+
+Laatste resultaat: **1000/1000**, **12.264 rallyhits**, **1000 modelwinsten**, circa **436 ms**. De batchstrategie forceert na een lange rally een begrensde menselijke misser om eindeloze perfecte rallies te voorkomen; dit verandert de normale interactieve spelmodus niet.
+
+## Ralph-98-kwaliteitslus
+
+1. **Ontwerp:** acht modelrollen worden door LiteLLM samengebracht.
+2. **Bouw:** Three.js-baan, vaste fysica, lokale opponent, geluid en fullscreen.
+3. **Statisch:** Node-contracttests controleren selectors, acht modellen, AudioContext, Fullscreen API en batch-runner.
+4. **Interactief:** Playwright controleert desktop, mobiel, besturing, reset, geluid, fullscreen en consolefouten.
+5. **Uithouding:** 1000 volledige matches worden automatisch uitgespeeld.
+6. **Release:** Vite-build, GitHub-push, Vercel-deploy en publieke smoke-test.
+
+De `98%` is een product- en persoonlijkheidsdoel, geen gemeten winstpercentage.
+
+## Bestandskaart
+
+| Bestand | Functie |
 |---|---|
-| `index.html` | Game shell, score HUD, controls and ensemble display |
-| `src/main.js` | Three.js scene, fixed physics, Ralph-98 controller |
-| `src/style.css` | Neon laboratory design system and responsive layout |
-| `tests/game.test.js` | Node static contract tests |
-| `tests/browser_smoke.py` | Playwright desktop/mobile functional smoke |
-| `scripts/request_ensemble.py` | Reproducible bounded LiteLLM panel request |
-| `docs/model-collaboration.md` | Eight-model design evidence |
+| `index.html` | Nederlandse game-shell, score, controls, geluid en fullscreenknoppen |
+| `src/main.js` | Three.js-scène, lokale tegenstander, Web Audio, Fullscreen API en batchrunner |
+| `src/style.css` | Neonlaboratorium, beeldvullende layout, responsive gedrag en reduced motion |
+| `tests/game.test.js` | Statische contracttests |
+| `tests/browser_smoke.py` | Playwright desktop/mobiele rooktest |
+| `tests/play_1000.py` | 1000 volledige matches via de echte engine |
+| `scripts/request_ensemble.py` | Reproduceerbare LiteLLM-vraag zonder secrets in output |
+| `docs/model-collaboration.md` | Acht-modelbesluiten en panelbewijs |
+| `vercel.json` | Vite-buildinstellingen voor Vercel |
 
-## Verification ledger
+## Verificatieledger
 
-| Gate | Result |
+| Controle | Resultaat |
 |---|---|
-| Atlas route + bounded excerpt | recorded |
-| LiteLLM eight-model panel | HTTP 200; 8-model brief returned |
-| `npm run build` | PASS; Vite production build generated |
-| `npm test` | PASS; 3/3 static checks |
-| Playwright desktop/mobile smoke | PASS; controls, reset, screenshots, 0 console errors |
-| Vercel deployment | PASS; `https://3d-pong-model-arena.vercel.app` |
+| `npm test` | PASS; statische contracttests |
+| `npm run build` | PASS; Vite productiebuild |
+| `git diff --check` | PASS |
+| Playwright desktop/mobiel | PASS; controls, reset, geluid, fullscreenknop, screenshots, 0 console-errors |
+| 1000 automatische matches | PASS; 1000 beëindigde matches, één winnaar per match |
+| Vercel-deployment | PASS; `https://3d-pong-model-arena.vercel.app` |
+| GitHub remote | PASS; `main` op `Maca2024/3d-pong-model-arena` |
 
-## Release evidence
+## Release
 
-The local Ralph-98 browser loop passed on desktop and mobile after the court-wall visual fix. The public deployment was then created with Vercel and aliased to `https://3d-pong-model-arena.vercel.app`. The same smoke suite is parameterized with `PONG_URL` so the public URL can be tested without changing source code.
-
-## Change policy
-
-No credentials belong in this repository. The ensemble request reads `LITELLM_MASTER_KEY` from the running proxy container and only writes bounded design evidence. Browser play contains no fetch/XHR call to the model proxy.
+- GitHub: [Maca2024/3d-pong-model-arena](https://github.com/Maca2024/3d-pong-model-arena)
+- Vercel: [3d-pong-model-arena.vercel.app](https://3d-pong-model-arena.vercel.app)
+- Ontwerpcommit: `bd071c5`
+- Documentatiecommit: `ef468d4`

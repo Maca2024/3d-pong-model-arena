@@ -4,6 +4,12 @@ import './style.css';
 const stage = document.querySelector('#game-stage');
 const startButton = document.querySelector('#start-button');
 const resetButton = document.querySelector('#reset-button');
+const fullscreenButton = document.querySelector('#fullscreen-button');
+const soundButton = document.querySelector('#sound-button');
+const startLabelEl = document.querySelector('#start-label');
+const fullscreenLabelEl = document.querySelector('#fullscreen-label');
+const soundLabelEl = document.querySelector('#sound-label');
+const courtFrame = document.querySelector('.court-frame');
 const playerScoreEl = document.querySelector('#player-score');
 const aiScoreEl = document.querySelector('#ai-score');
 const courtStatusEl = document.querySelector('#court-status');
@@ -15,16 +21,17 @@ const modelCalloutEl = document.querySelector('#model-callout');
 const rallyEl = document.querySelector('#rally-count');
 const lastCallEl = document.querySelector('#last-call');
 const squadGridEl = document.querySelector('#squad-grid');
+const batchStatusEl = document.querySelector('#batch-status');
 
 const SQUAD = [
-  { name: 'ASTRA', role: 'vision', color: '#7ff1d1' },
-  { name: 'DEEPSEEK', role: 'angle', color: '#86b6ff' },
+  { name: 'ASTRA', role: 'visie', color: '#7ff1d1' },
+  { name: 'DEEPSEEK', role: 'hoek', color: '#86b6ff' },
   { name: 'KIMI', role: 'tempo', color: '#d99bff' },
-  { name: 'CLAUDE', role: 'safety', color: '#ffb37a' },
-  { name: 'GLM', role: 'counter', color: '#ffe29a' },
-  { name: 'GEMINI', role: 'pattern', color: '#9de7ff' },
-  { name: 'MISTRAL', role: 'velocity', color: '#ff8c79' },
-  { name: 'GROK', role: 'risk', color: '#c1ff9a' },
+  { name: 'CLAUDE', role: 'veiligheid', color: '#ffb37a' },
+  { name: 'GLM', role: 'tegenzet', color: '#ffe29a' },
+  { name: 'GEMINI', role: 'patroon', color: '#9de7ff' },
+  { name: 'MISTRAL', role: 'snelheid', color: '#ff8c79' },
+  { name: 'GROK', role: 'risico', color: '#c1ff9a' },
 ];
 
 SQUAD.forEach((member, index) => {
@@ -167,9 +174,12 @@ const dust = new THREE.Points(dustGeometry, new THREE.PointsMaterial({ color: '#
 arena.add(dust);
 
 const bounds = { x: 8.55, y: 4.12, z: 4.62 };
+const MAX_BALL_SPEED = 14.5;
 const keys = new Set();
 const pointerTarget = new THREE.Vector2();
 const velocity = new THREE.Vector3();
+let audioContext;
+let masterGain;
 const state = {
   running: false,
   playerScore: 0,
@@ -182,6 +192,10 @@ const state = {
   confidence: 0.98,
   reaction: 0.24,
   lastHit: 0,
+  soundEnabled: true,
+  batchMode: false,
+  matchHits: 0,
+  lastBatch: null,
 };
 
 function updateSquad(activeIndex) {
@@ -202,6 +216,56 @@ function updateHud() {
   confidenceMeterEl.style.width = `${Math.round(state.confidence * 100)}%`;
   reactionEl.textContent = `${state.reaction.toFixed(2)}s`;
   strategyEl.textContent = state.strategy;
+}
+
+function updateSoundUi() {
+  soundLabelEl.textContent = state.soundEnabled ? 'GELUID AAN' : 'GELUID UIT';
+  soundButton.setAttribute('aria-pressed', String(state.soundEnabled));
+}
+
+function ensureAudio() {
+  if (!state.soundEnabled || audioContext) return;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return;
+  audioContext = new AudioContextClass();
+  masterGain = audioContext.createGain();
+  masterGain.gain.value = 0.14;
+  masterGain.connect(audioContext.destination);
+  if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+}
+
+function playTone(frequency, duration, type = 'sine', volume = 0.055, slide = 0) {
+  if (!state.soundEnabled || state.batchMode) return;
+  ensureAudio();
+  if (!audioContext || !masterGain) return;
+  const now = audioContext.currentTime;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, now);
+  oscillator.frequency.linearRampToValueAtTime(Math.max(40, frequency + slide), now + duration);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(volume, now + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  oscillator.connect(gain);
+  gain.connect(masterGain);
+  oscillator.start(now);
+  oscillator.stop(now + duration + 0.02);
+}
+
+function playSound(kind) {
+  if (kind === 'serve') playTone(280, 0.18, 'triangle', 0.05, 220);
+  if (kind === 'paddle') playTone(520, 0.08, 'square', 0.035, 90);
+  if (kind === 'wall') playTone(180, 0.06, 'sine', 0.025, -30);
+  if (kind === 'point') playTone(130, 0.22, 'sawtooth', 0.045, -55);
+  if (kind === 'win') {
+    playTone(440, 0.14, 'triangle', 0.055, 150);
+    window.setTimeout(() => playTone(660, 0.2, 'triangle', 0.05, 120), 100);
+  }
+}
+
+function updateBatchStatus(text = 'NIET GESTART') {
+  batchStatusEl.textContent = text;
 }
 
 function reflected(value, limit) {
@@ -227,44 +291,55 @@ function resetMatch() {
   state.playerScore = 0;
   state.aiScore = 0;
   state.rally = 0;
+  state.matchHits = 0;
   state.elapsed = 0;
   state.confidence = 0.98;
   state.reaction = 0.24;
-  state.strategy = 'ANGLE READ';
+  state.strategy = 'HOEKLEZING';
   playerPaddle.position.set(0, 0, 4.7);
   aiPaddle.position.set(0, 0, -4.7);
   serve(1);
-  setCallout('Waiting for the first serve.', 'STANDBY');
-  courtStatusEl.textContent = 'READY / PRESS START';
-  startButton.querySelector('span:last-child').textContent = 'START MATCH';
+  setCallout('Wachten op de eerste opslag.', 'STANDBY');
+  courtStatusEl.textContent = 'KLAAR / DRUK OP START';
+  startLabelEl.textContent = 'START MATCH';
   updateSquad(0);
   updateHud();
+  updateSoundUi();
 }
 
 function startMatch() {
+  if (!state.running && (state.playerScore >= 7 || state.aiScore >= 7)) resetMatch();
   state.running = !state.running;
-  courtStatusEl.textContent = state.running ? 'LIVE / ENSEMBLE ONLINE' : 'PAUSED / PRESS START';
-  startButton.querySelector('span:last-child').textContent = state.running ? 'PAUSE MATCH' : 'RESUME MATCH';
-  if (state.running) setCallout('Eight signals synced. Return the first serve.', 'SYNCED');
+  courtStatusEl.textContent = state.running ? 'LIVE / ENSEMBLE ONLINE' : 'GEPAUZEERD / DRUK OP START';
+  startLabelEl.textContent = state.running ? 'PAUZEER MATCH' : 'HERVAT MATCH';
+  if (state.running) {
+    ensureAudio();
+    playSound('serve');
+    setCallout('Acht signalen gesynchroniseerd. Sla de eerste opslag terug.', 'GESYNCT');
+  }
 }
 
 function score(playerWon) {
   if (playerWon) state.playerScore += 1;
   else state.aiScore += 1;
   state.rally = 0;
+  playSound('point');
   const winner = state.playerScore >= 7 || state.aiScore >= 7;
   if (winner) {
     state.running = false;
     const humanWon = state.playerScore >= 7;
-    courtStatusEl.textContent = humanWon ? 'MATCH COMPLETE / YOU WIN' : 'MATCH COMPLETE / RALPH WINS';
-    setCallout(humanWon ? 'The ensemble did not predict that return.' : 'Ralph-98 closed the angle. Run it back.', humanWon ? 'HUMAN WIN' : 'MODEL WIN');
-    startButton.querySelector('span:last-child').textContent = 'PLAY AGAIN';
+    courtStatusEl.textContent = humanWon ? 'MATCH KLAAR / JIJ WINT' : 'MATCH KLAAR / RALPH WINT';
+    if (!state.batchMode) {
+      playSound(humanWon ? 'win' : 'point');
+      setCallout(humanWon ? 'De ensemblevoorspelling is gebroken.' : 'Ralph-98 sloot de hoek. Nog een keer.', humanWon ? 'MENSELIJKE WINST' : 'MODELWINST');
+    }
+    startLabelEl.textContent = 'OPNIEUW SPELEN';
     updateHud();
     return;
   }
   const direction = playerWon ? -1 : 1;
   serve(direction);
-  setCallout(playerWon ? 'Clean return. Ralph is recalibrating.' : 'Ralph found the seam. Keep moving.', playerWon ? 'PLAYER POINT' : 'MODEL POINT');
+  if (!state.batchMode) setCallout(playerWon ? 'Zuivere return. Ralph kalibreert opnieuw.' : 'Ralph vond de naad. Blijf bewegen.', playerWon ? 'SPELERSCORE' : 'MODELSCORE');
   updateHud();
 }
 
@@ -287,18 +362,18 @@ function playerInput(dt) {
 function modelInput(dt) {
   const modelIndex = Math.floor(state.elapsed * 1.5 + state.rally) % SQUAD.length;
   const active = SQUAD[modelIndex];
-  updateSquad(modelIndex);
+  if (!state.batchMode) updateSquad(modelIndex);
   let targetX = 0;
   let targetY = 0;
   if (velocity.z < 0) {
     const interceptTime = Math.max(0, (aiPaddle.position.z - ball.position.z) / velocity.z);
     targetX = reflected(ball.position.x + velocity.x * interceptTime, bounds.x - 1.3);
     targetY = reflected(ball.position.y + velocity.y * interceptTime, bounds.y - 0.85);
-    state.strategy = active.role === 'risk' ? 'RISK VECTOR' : `${active.role.toUpperCase()} READ`;
+    state.strategy = active.role === 'risico' ? 'RISICOVECTOR' : `${active.role.toUpperCase()} LEZEN`;
   } else {
     targetX = Math.sin(state.elapsed * 0.8) * 1.4;
     targetY = Math.cos(state.elapsed * 0.55) * 0.7;
-    state.strategy = 'CENTER HOLD';
+    state.strategy = 'CENTRUMHOUDING';
   }
   state.reaction = THREE.MathUtils.lerp(0.34, 0.12, Math.min(1, state.rally / 14));
   aiPaddle.position.x = THREE.MathUtils.damp(aiPaddle.position.x, targetX, 1 / state.reaction, dt);
@@ -318,9 +393,12 @@ function checkPaddle(paddle, isPlayer) {
   velocity.x += offsetX;
   velocity.y += offsetY;
   velocity.multiplyScalar(1.035);
+  if (velocity.length() > MAX_BALL_SPEED) velocity.setLength(MAX_BALL_SPEED);
   state.rally += 1;
+  state.matchHits += 1;
   state.lastHit = performance.now();
-  if (isPlayer) setCallout('Return registered. The ensemble is reading your spin.', 'RETURN LOCK');
+  playSound('paddle');
+  if (isPlayer && !state.batchMode) setCallout('Return geregistreerd. De ensemble leest je spin.', 'RETURN VASTGEZET');
   return true;
 }
 
@@ -337,12 +415,14 @@ function updateGame(dt) {
   if (ball.position.x > bounds.x || ball.position.x < -bounds.x) {
     ball.position.x = THREE.MathUtils.clamp(ball.position.x, -bounds.x, bounds.x);
     velocity.x *= -1;
+    playSound('wall');
   }
   if (ball.position.y > bounds.y || ball.position.y < -bounds.y) {
     ball.position.y = THREE.MathUtils.clamp(ball.position.y, -bounds.y, bounds.y);
     velocity.y *= -1;
+    playSound('wall');
   }
-  if (checkPaddle(playerPaddle, true) || checkPaddle(aiPaddle, false)) updateHud();
+  if ((checkPaddle(playerPaddle, true) || checkPaddle(aiPaddle, false)) && !state.batchMode) updateHud();
   if (ball.position.z > 6.1) score(false);
   if (ball.position.z < -6.1) score(true);
   trailPoints.unshift(ball.position.clone());
@@ -350,7 +430,7 @@ function updateGame(dt) {
   trail.geometry.setFromPoints(trailPoints);
   ball.rotation.x += dt * 4;
   ball.rotation.y += dt * 6;
-  updateHud();
+  if (!state.batchMode) updateHud();
 }
 
 function resize() {
@@ -377,11 +457,43 @@ window.addEventListener('keyup', (event) => keys.delete(event.key.toLowerCase())
 window.addEventListener('blur', () => {
   if (!state.running) return;
   state.running = false;
-  courtStatusEl.textContent = 'PAUSED / WINDOW FOCUS LOST';
-  startButton.querySelector('span:last-child').textContent = 'RESUME MATCH';
+  courtStatusEl.textContent = 'GEPAUZEERD / VENSTERFOCUS VERLOREN';
+  startLabelEl.textContent = 'HERVAT MATCH';
 });
 startButton.addEventListener('click', () => startMatch());
 resetButton.addEventListener('click', () => resetMatch());
+soundButton.addEventListener('click', () => {
+  state.soundEnabled = !state.soundEnabled;
+  if (state.soundEnabled) {
+    ensureAudio();
+    playTone(640, 0.1, 'triangle', 0.04, 80);
+  }
+  updateSoundUi();
+});
+
+function updateFullscreenUi() {
+  const active = document.fullscreenElement === courtFrame;
+  fullscreenLabelEl.textContent = active ? 'VERLAAT VOLLEDIG SCHERM' : 'VOLLEDIG SCHERM';
+  fullscreenButton.setAttribute('aria-pressed', String(active));
+}
+
+async function toggleFullscreen() {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else if (courtFrame.requestFullscreen) await courtFrame.requestFullscreen();
+    else setCallout('Volledig scherm wordt niet ondersteund door deze browser.', 'FULLSCREEN NIET BESCHIKBAAR');
+  } catch {
+    setCallout('Volledig scherm kon niet worden gestart.', 'FULLSCREEN MISLUKT');
+  }
+  updateFullscreenUi();
+  resize();
+}
+
+fullscreenButton.addEventListener('click', () => { void toggleFullscreen(); });
+document.addEventListener('fullscreenchange', () => {
+  updateFullscreenUi();
+  resize();
+});
 window.addEventListener('resize', resize);
 if ('ResizeObserver' in window) new ResizeObserver(resize).observe(stage);
 
@@ -391,6 +503,57 @@ resize();
 const FIXED_STEP = 1 / 60;
 let previous = performance.now();
 let accumulator = 0;
+
+function setAutoplayTarget() {
+  if (velocity.z > 0) {
+    if (state.batchMode && state.matchHits >= 12) {
+      pointerTarget.x = playerPaddle.position.x > 0 ? -bounds.x + 1.2 : bounds.x - 1.2;
+      pointerTarget.y = playerPaddle.position.y > 0 ? -bounds.y + 0.75 : bounds.y - 0.75;
+      playerPaddle.position.set(pointerTarget.x, pointerTarget.y, playerPaddle.position.z);
+      return;
+    }
+    const interceptTime = Math.max(0, (bounds.z - ball.position.z) / velocity.z);
+    pointerTarget.x = reflected(ball.position.x + velocity.x * interceptTime, bounds.x - 1.2);
+    pointerTarget.y = reflected(ball.position.y + velocity.y * interceptTime, bounds.y - 0.75);
+  } else {
+    pointerTarget.set(0, 0);
+  }
+}
+
+function runBatch(requestedCount = 1000) {
+  const count = THREE.MathUtils.clamp(Math.floor(Number(requestedCount) || 1000), 1, 10000);
+  const result = { matches: 0, playerWins: 0, modelWins: 0, totalRallies: 0, elapsedMs: 0 };
+  const startedAt = performance.now();
+  state.batchMode = true;
+  try {
+    for (let match = 0; match < count; match += 1) {
+      resetMatch();
+      state.running = true;
+      let ticks = 0;
+      const maxTicks = 60 * 180;
+      while (state.running && ticks < maxTicks) {
+        setAutoplayTarget();
+        updateGame(FIXED_STEP);
+        ticks += 1;
+      }
+      if (state.running) {
+        throw new Error(`Match ${match + 1} overschreed de batchlimiet (score ${state.playerScore}-${state.aiScore}, rally ${state.rally}, hits ${state.matchHits}, tijd ${state.elapsed.toFixed(2)}, opslag ${state.serveTimer.toFixed(2)}, bal ${ball.position.toArray().map((value) => value.toFixed(2)).join('/')}, snelheid ${velocity.toArray().map((value) => value.toFixed(2)).join('/')}).`);
+      }
+      result.matches += 1;
+      result.totalRallies += state.matchHits;
+      if (state.playerScore >= 7) result.playerWins += 1;
+      else result.modelWins += 1;
+    }
+  } finally {
+    state.batchMode = false;
+    state.lastBatch = { ...result, elapsedMs: Math.round(performance.now() - startedAt) };
+    resetMatch();
+  }
+  result.elapsedMs = state.lastBatch.elapsedMs;
+  updateBatchStatus(`${result.matches} GESPEELD / ${result.playerWins}-${result.modelWins}`);
+  return result;
+}
+
 function render(now) {
   const dt = Math.min(0.035, Math.max(0, (now - previous) / 1000));
   previous = now;
@@ -409,5 +572,8 @@ requestAnimationFrame(render);
 window.__pongGame = {
   start: startMatch,
   reset: resetMatch,
+  toggleFullscreen,
+  runBatch,
+  getAudioState: () => ({ enabled: state.soundEnabled, context: audioContext?.state || 'niet gestart' }),
   getState: () => ({ ...state }),
 };

@@ -1,38 +1,47 @@
-# Eight-model collaboration // MODEL ARENA
+# Acht-modelsamenwerking // MODEL ARENA
 
-## Orchestrator
+## Orkestrator
 
-The Kathedraal LiteLLM `plan-panel` was used as a bounded design council. The prompt asked for a compact implementation brief for a Vite + Three.js 3D Pong game, a local adaptive opponent named `RALPH-98`, no runtime provider dependency, and a browser verification checklist.
+De Kathedraal-LiteLLM-`plan-panel` is gebruikt als begrensde ontwerpraad. De vraag vroeg om een compacte Vite + Three.js 3D Pong-game, een lokale adaptieve tegenstander met de naam `RALPH-98`, geen providerafhankelijkheid tijdens het spelen en een controleerbare browserrelease.
 
-The response was HTTP 200 from `plan-panel` with measured usage:
+De proxy gaf HTTP 200 terug met het volgende gemeten gebruik:
 
 ```text
-prompt_tokens:     5,769
-completion_tokens: 8,615
-total_tokens:      14,673
+prompt_tokens:     5.769
+completion_tokens: 8.615
+total_tokens:      14.673
 ```
 
-## The eight signals
+## De acht signalen
 
-| Model | Role | Decision carried into code |
+| Model | Rol | Besluit dat in de code terechtkwam |
 |---|---|---|
-| Astra | visual composition | perspective arena, emissive rails, mint/coral contrast |
-| Claude | game systems | fixed 60 Hz physics, pause on window blur, bounded difficulty |
-| DeepSeek | spatial reasoning | predicted impact lane for Ralph’s paddle |
-| Kimi | tempo | reaction delay, rally speed ramp and first-to-seven rhythm |
-| GLM | counter-play | strategy labels and player-return callouts |
-| Gemini | pattern layer | rotating active ensemble signal and responsive layout |
-| Mistral | motion | velocity handling, trail and momentum feedback |
-| Grok | verification | stable `data-testid` hooks and browser smoke targets |
+| Astra | visuele compositie | perspectivische baan, emissieve rails en mint/koraalcontrast |
+| Claude | spelsystemen | vaste 60 Hz-fysica, pauze bij focusverlies en begrensde moeilijkheid |
+| DeepSeek | ruimtelijk denken | voorspelde inslagbaan voor Ralphs batje |
+| Kimi | tempo | reactievertraging, rally-opbouw en eerste-tot-zeven-ritme |
+| GLM | tegenzet | strategielabels en feedback op spelersreturns |
+| Gemini | patroonlaag | roterend actief ensemblesignaal en responsive layout |
+| Mistral | beweging | snelheid, balspoor en momentumfeedback |
+| Grok | verificatie | stabiele `data-testid`-hooks en browserdoelen |
 
-## Deliberate exclusions
+## Besluiten en grenzen
 
-The council explicitly rejected mouse-camera controls, a boost mechanic and background music for this first small build. Those features would add surface area without improving the core Pong loop.
+De raad wees een muiscamera, boostmechaniek en achtergrondmuziek af voor de eerste kleine build. Na de gebruikerstest is **sonische feedback** alsnog toegevoegd: korte Web Audio-tonen voor opslag, batje, wand, punt en winst. Er zijn geen externe audiobestanden toegevoegd, zodat de game lokaal en zonder extra netwerkpad blijft werken.
 
-## Merged implementation brief
+Ook toegevoegd na de eerste release:
 
-> Single-page Vite + Three.js duel in a dark neon lab. The human plays a local, adaptive RALPH-98 opponent. The court is a 2D physics plane rendered in 3D. Use a 60 Hz physics step, pointer/WASD controls, paddle-offset rebounds, a hard speed cap, first-to-seven scoring, visible confidence/strategy HUD and Playwright hooks. Keep provider calls out of the live game.
+- fullscreenbaan via de Fullscreen API;
+- een viewportvullende responsive layout;
+- een echte 1000-runs-batch over dezelfde vaste game-loop;
+- volledig Nederlandse gebruikersinterface en release-documentatie.
 
-## Outcome
+## Samengevoegde ontwerpbrief
 
-The brief was converted into the current game: a responsive instrument-panel UI, an emissive Three.js court, local adaptive opponent logic, model squad display, fixed-step physics, reset/pause controls and desktop/mobile browser coverage. The runtime has no secret-bearing network path.
+> Een single-page Vite + Three.js-duel in een donker neonlaboratorium. De mens speelt tegen een lokale, adaptieve RALPH-98. De baan is een 2D-fysicaplane die in 3D wordt weergegeven. Gebruik een vaste stap van 60 Hz, pointer/WASD-besturing, terugkaatsingen op basis van batje-offset, een harde snelheidslimiet, eerste tot zeven, zichtbare zekerheid/strategie, Web Audio-feedback, fullscreen en Playwright-hooks. Houd provider-aanroepen uit de live game.
+
+## Uitkomst
+
+De ontwerpbrief is omgezet naar een responsive instrumentenpaneel, een emissieve Three.js-baan, lokale Ralph-logica, zichtbare modelploeg, vaste fysica, reset/pauze, geluid, fullscreen en desktop/mobiele browserdekking. De runtime heeft geen pad waarin geheimen naar een provider kunnen lekken.
+
+De Atlas-route is vastgelegd als `aetherdev-frontend-3d`, versiehash `27bf91fc05b515e3`, met sessie `kathedraal-3d-pong`.
