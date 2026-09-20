@@ -13,6 +13,7 @@
 
 > **Play the live build:** [3d-pong-model-arena.vercel.app](https://3d-pong-model-arena.vercel.app)
 > Production deployment verified: Vercel alias is live and serves the Vite build.
+> **Source repository:** [github.com/Maca2024/3d-pong-model-arena](https://github.com/Maca2024/3d-pong-model-arena)
 
 <p align="center">
   <img src="docs/screenshots/pong-desktop.png" alt="MODEL ARENA desktop court" width="92%">

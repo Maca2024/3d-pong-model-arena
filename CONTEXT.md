@@ -4,6 +4,8 @@
 
 This is a new, isolated game repository created from the request to build a simple 3D Pong game in which a human plays against a model. The implementation uses Three.js and Vite. It is intentionally frontend-only during play: no browser key, prompt or provider request is needed after load.
 
+Release links: [GitHub repository](https://github.com/Maca2024/3d-pong-model-arena) · [live Vercel build](https://3d-pong-model-arena.vercel.app)
+
 ## Orchestration record
 
 ### Atlas / `/aetherdev`
