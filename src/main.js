@@ -450,6 +450,11 @@ stage.addEventListener('pointerdown', () => { if (!state.running) startMatch(); 
 window.addEventListener('keydown', (event) => {
   const key = event.key.toLowerCase();
   if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) event.preventDefault();
+  if (key === 'f') {
+    event.preventDefault();
+    if (!event.repeat) void toggleFullscreen();
+    return;
+  }
   if (key === ' ') startMatch();
   keys.add(key);
 });

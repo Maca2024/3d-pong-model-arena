@@ -49,6 +49,7 @@ De game doet tijdens het spelen geen provider-aanroepen. De samenwerking via Lit
 
 - **Geluid:** Web Audio API-feedback voor opslag, batje, wand, punt en winst. Geen externe audiobestanden, dus geen extra netwerkafhankelijkheid.
 - **Volledig scherm:** de knop `VOLLEDIG SCHERM` maakt de 3D-baan beeldvullend via de Fullscreen API.
+- **Snelle fullscreen-toets:** druk op `F` om direct alleen de gamebaan te zien; druk opnieuw op `F` of `Esc` om terug te gaan.
 - **Beeldvullende layout:** de baan schaalt mee met de viewport en gebruikt op mobiel een royale speelzone.
 - **Besturing:** `W`/`S`, pijltjestoetsen, muis, touch en `spatie`.
 - **1000-runs controle:** dezelfde game-engine bevat een geautomatiseerde batch-runner waarmee 1000 volledige matches zijn uitgespeeld en gecontroleerd.
@@ -81,6 +82,7 @@ De volledige samenwerking staat in [`docs/model-collaboration.md`](docs/model-co
 | `BAAN RESETTEN` | Ga terug naar 00–00 |
 | `GELUID AAN` | Zet de sonische feedback aan of uit |
 | `VOLLEDIG SCHERM` | Maak de baan beeldvullend |
+| `F` | Schakel direct naar alleen de gamebaan |
 
 De eerste speler met **07** punten wint. Waar je het batje raakt verandert de terugkaatshoek. Een lange rally verhoogt het vertrouwen van Ralph, maar een menselijke return kan zijn lezing nog steeds breken.
 
@@ -102,7 +104,7 @@ De `98%` is een ontwerpdoel en persoonlijkheidsmarkering, geen statistische wins
 
 Geluid wordt veilig geactiveerd na een gebruikersactie, zodat autoplay-beleid van browsers wordt gerespecteerd. De Web Audio-keten bestaat uit korte oscillator-tonen met een lage mastergain: opslag, batje, wand, punt en winst hebben ieder een eigen signatuur. Via `GELUID AAN` blijft de speler altijd in controle.
 
-De Fullscreen API maakt alleen de baan zelf fullscreen. Daardoor blijven de Three.js-canvas, score-overlay, statusregel en hoeken zichtbaar. `Esc` sluit fullscreen weer af; de knop synchroniseert mee met de browserstatus.
+De Fullscreen API maakt alleen de baan zelf fullscreen. Daardoor blijven de Three.js-canvas, score-overlay, statusregel en hoeken zichtbaar. `F` schakelt direct in en uit; `Esc` sluit fullscreen weer af. De knop synchroniseert mee met de browserstatus.
 
 ## 1000 matches
 

@@ -24,6 +24,7 @@ test('the game uses a fixed physics step and a full model ensemble', () => {
   assert.match(source, /runBatch/);
   assert.match(source, /AudioContext/);
   assert.match(source, /requestFullscreen/);
+  assert.match(source, /key === 'f'/);
   assert.doesNotMatch(source, /fetch\(/);
 });
 

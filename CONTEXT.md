@@ -65,6 +65,7 @@ Volledig bewijs staat in [`docs/model-collaboration.md`](docs/model-collaboratio
 
 - De baan schaalt met `svh`/`dvh` en krijgt op desktop een royale viewporthoogte.
 - `VOLLEDIG SCHERM` gebruikt `courtFrame.requestFullscreen()`.
+- `F` schakelt dezelfde fullscreenbaan direct in en uit; een herhaalde toetsdruk wordt genegeerd.
 - `fullscreenchange` houdt knoplabel, score-overlay, status en canvas synchroon.
 - `Esc` werkt via de browser en sluit de fullscreenbaan.
 

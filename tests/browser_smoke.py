@@ -46,9 +46,16 @@ def main() -> None:
         assert page.get_by_test_id("player-score").inner_text() == "00"
         assert page.get_by_test_id("ai-score").inner_text() == "00"
         assert "KLAAR" in page.get_by_test_id("court-status").inner_text()
-        page.get_by_test_id("fullscreen-button").click()
+        page.get_by_test_id("start-button").click()
+        page.keyboard.press("f")
         page.wait_for_timeout(100)
         assert page.get_by_test_id("fullscreen-button").get_attribute("aria-pressed") in {"true", "false"}
+        page.keyboard.down("w")
+        page.wait_for_timeout(120)
+        page.keyboard.up("w")
+        if page.get_by_test_id("fullscreen-button").get_attribute("aria-pressed") == "true":
+            page.keyboard.press("f")
+            page.wait_for_timeout(100)
 
         mobile = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=1)
         mobile.goto(BASE_URL, wait_until="networkidle")
