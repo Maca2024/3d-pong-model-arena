@@ -115,5 +115,7 @@ De `98%` is een product- en persoonlijkheidsdoel, geen gemeten winstpercentage.
 
 - GitHub: [Maca2024/3d-pong-model-arena](https://github.com/Maca2024/3d-pong-model-arena)
 - Vercel: [3d-pong-model-arena.vercel.app](https://3d-pong-model-arena.vercel.app)
-- Ontwerpcommit: `bd071c5`
-- Documentatiecommit: `ef468d4`
+- Basiscommit: `bd071c5`
+- Eerste release-documentatie: `ef468d4`
+- Functionele release met geluid, fullscreen en batchrunner: `2529c6a`
+- Laatste documentatie- en verificatiebewijs: `a88a8b9`
