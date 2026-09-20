@@ -117,7 +117,7 @@ python tests/play_1000.py --url http://127.0.0.1:5173 --count 1000
 
 De test schrijft bewijs naar `test-results/batch-1000.json` en controleert dat alle aangevraagde matches eindigen met precies één winnaar.
 
-Laatste gecontroleerde batch: **1000/1000 matches**, **12.264 rallyhits**, **1000 modelwinsten**, voltooid in ongeveer **436 ms** in Chromium headless. De spelerstrategie is in deze endurance-run bewust defensief begrensd; de interactieve speler blijft vrij om Ralph wel degelijk te verslaan.
+Laatste gecontroleerde batch: lokaal **1000/1000 matches**, **12.264 rallyhits**, **1000 modelwinsten** in ongeveer **436 ms**. De gedeployde Vercel-alias is daarna opnieuw gecontroleerd met **1000/1000** in ongeveer **906 ms**. De spelerstrategie is in deze endurance-run bewust defensief begrensd; de interactieve speler blijft vrij om Ralph wel degelijk te verslaan.
 
 ## Visueel systeem
 

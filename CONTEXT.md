@@ -72,7 +72,7 @@ Volledig bewijs staat in [`docs/model-collaboration.md`](docs/model-collaboratio
 
 `window.__pongGame.runBatch(1000)` speelt de echte game-loop 1000 keer uit met een automatische menselijke speler. Elke run doorloopt opslag, rally, botsingen, score, reset en match-einde. De Playwright-runner [`tests/play_1000.py`](tests/play_1000.py) controleert dat alle 1000 matches eindigen met precies één winnaar en schrijft JSON-bewijs naar `test-results/batch-1000.json`.
 
-Laatste resultaat: **1000/1000**, **12.264 rallyhits**, **1000 modelwinsten**, circa **436 ms**. De batchstrategie forceert na een lange rally een begrensde menselijke misser om eindeloze perfecte rallies te voorkomen; dit verandert de normale interactieve spelmodus niet.
+Laatste lokale resultaat: **1000/1000**, **12.264 rallyhits**, **1000 modelwinsten**, circa **436 ms**. De publieke Vercel-alias is daarna opnieuw gecontroleerd: **1000/1000**, dezelfde **12.264 rallyhits** en circa **906 ms**. De batchstrategie forceert na een lange rally een begrensde menselijke misser om eindeloze perfecte rallies te voorkomen; dit verandert de normale interactieve spelmodus niet.
 
 ## Ralph-98-kwaliteitslus
 
